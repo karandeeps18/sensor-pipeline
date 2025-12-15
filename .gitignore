@@ -1,0 +1,24 @@
+# Virtual environment
+venv/
+.venv/
+
+# Output data 
+output/data/
+output/results/
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,5 @@
+numpy>=1.24.0
+pandas>=2.0.0
+pyarrow>=14.0.0
+holidays>=0.40
+matplotlib>=3.7.0
