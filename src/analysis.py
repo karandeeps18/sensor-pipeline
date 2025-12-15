@@ -60,23 +60,39 @@ def get_bucket_label(t: time):
     end = (datetime(2020,1,1, t.hour, t.minute) + timedelta(minutes=BUCKET_MINUTES)).time()
     return f"{t.strftime('%H:%M')}-{end.strftime('%H:%M')}"
 
-def load_filtered_data(data_dir: Path, sensor_ids: list[int]) -> pd.DataFrame:
-    """Load data using predicate pushdown for hive partitioning"""
-    
+def load_filtered_data(
+    data_dir: Path,
+    sensor_ids: list[int],
+    product_id: int | None = None,
+) -> pd.DataFrame:
+    """
+    Load data from a Hive-partitioned Parquet dataset with predicate pushdown.
+
+    - data_dir: root of the dataset (contains product_id=... folders)
+    - sensor_ids: numeric sensor IDs to keep
+    - product_id: if given, restrict to that product only
+    """
+
+    # Hive partitioning on product_id
     partition = ds.partitioning(
-        pa.schema([
-            ("product_id", pa.uint8())]), 
-            flavor = "hive"
+        pa.schema([("product_id", pa.uint8())]),
+        flavor="hive",
     )
-    
+
     dataset = ds.dataset(data_dir, format="parquet", partitioning=partition)
-    
-    # Filter sensor where id % 3 == 0
-    table = dataset.to_table(
-        filter=ds.field("sensor_id").isin(sensor_ids)
-    )
-    
+
+    # Build filter
+    sensor_filter = ds.field("sensor_id").isin(sensor_ids)
+
+    if product_id is not None:
+        product_filter = ds.field("product_id") == product_id
+        combined_filter = sensor_filter & product_filter
+    else:
+        combined_filter = sensor_filter
+
+    table = dataset.to_table(filter=combined_filter)
     return table.to_pandas()
+
     
 def filter_uk_monday_window(df: pd.DataFrame, mondays: list[datetime]) -> pd.DataFrame:
     """Filter data to UK Mondays between 09:30-12:30."""
@@ -122,36 +138,67 @@ def compute_across_days_aggregations(per_day_df):
     
     return agg
 
-
-def run_analysis(sensor_ids, output_suffix):
-    """run analysis pipeline
-    args: 
-        sensor_ids: List of sensor IDs to analyze 
-        output_suffix: suffix for output _with_new_sensor
-    returns:
-        tuple of (perday_df, accross_days_df)
-    """
-    # get mondays 
+def run_analysis(sensor_ids: list[int], output_suffix: str = "") -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Run full analysis pipeline."""
+    print(f"Running analysis for {len(sensor_ids)} sensors...")
+    
+    # Get UK non-holiday Mondays
     mondays = get_uk_non_holiday_mondays(2020)
+    print(f"  Found {len(mondays)} non-holiday Mondays in 2020")
     
-    # load filtered data 
-    df = load_filtered_data(DATA_DIR, sensor_ids)
+    # Process one product at a time to save memory
+    all_per_day = []
     
-    # filter UK monday windows  
-    df = filter_uk_monday_window(df, mondays)
+    for product_id in range(0, 11):
+        print(f"Processing product {product_id}/10")
+        
+        # Load data for this product only
+        df = load_filtered_data(DATA_DIR, sensor_ids, product_id=product_id)
+        
+        if df.empty:
+            print(f"Warning: No data for product {product_id}")
+            continue
+        
+        # Filter to UK Monday windows
+        df = filter_uk_monday_window(df, mondays)
+        
+        if df.empty:
+            continue
+        
+        # Compute per-day aggregations for this product
+        per_day = compute_per_day_aggregations(df)
+        per_day["product_id"] = product_id
+        all_per_day.append(per_day)
+        
+        # Free memory
+        del df
     
-    #compute aggregations 
-    per_day = compute_per_day_aggregations(df)
-    across_day = compute_across_days_aggregations(per_day)
+    # Combine all products
+    if not all_per_day:
+        print("  Warning: No data found!")
+        return pd.DataFrame(), pd.DataFrame()
     
-    # save results
+    per_day = pd.concat(all_per_day, ignore_index=True)
+    print(f"  Total per-day rows: {len(per_day):,}")
+    
+    # Compute across-days aggregations
+    print("  Computing across-days aggregations...")
+    across_days = compute_across_days_aggregations(per_day)
+    
+    # Save results
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     
     per_day_file = RESULTS_DIR / f"per_day{output_suffix}.csv"
-    across_days_file = RESULTS_DIR / F"acrss_days{output_suffix}.csv"
+    across_days_file = RESULTS_DIR / f"across_days{output_suffix}.csv"
     
-    return per_day, across_day
+    per_day.to_csv(per_day_file, index=False)
+    across_days.to_csv(across_days_file, index=False)
     
+    print(f"  Saved: {per_day_file}")
+    print(f"  Saved: {across_days_file}")
+    
+    return per_day, across_days
+
 def get_base_sensor_ids():
     return [i for i in range(NUM_BASE_SENSORS) if i % 3== 0]
     

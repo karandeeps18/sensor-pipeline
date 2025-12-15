@@ -99,7 +99,7 @@ def main():
     assert DATA_DIR.exists(), "Output directory not created"
     
     # Check at least one file per product
-    for pid in range(1, NUM_PRODUCTS + 1):
+    for pid in range(NUM_PRODUCTS):
         partition_dir = DATA_DIR / f"product_id={pid}"
         assert partition_dir.exists(), f"Missing partition for product {pid}"
         files = list(partition_dir.glob("*.parquet"))
