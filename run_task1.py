@@ -2,6 +2,8 @@ import sys
 import time
 sys.path.insert(0, ".")
 
+from src.visualization import generate_all_graphics
+
 from src.analysis import(
     run_analysis,
     get_base_sensor_ids,
@@ -37,6 +39,10 @@ def main():
     print(f"  Per-day rows: {len(per_day_ext):,}")
     print(f"  Across-days rows: {len(across_day_ext):,}")
     
-    
+    # generate graphics 
+    start_time = time.time()
+    generate_all_graphics()
+    elapsed = time.time() - start_time
+
 if __name__ == "__main__":
     main()
