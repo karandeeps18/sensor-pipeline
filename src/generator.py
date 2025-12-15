@@ -1,4 +1,4 @@
-""" Synthetic data generation module"""
+"""Synthetic data generation module"""
 import math 
 import numpy as np
 import pandas as pd
@@ -54,7 +54,7 @@ def generate_sensor_data(
     rng: np.random.Generator
     
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Generate timestamps and values for one product-sensor pair """
+    """Generate timestamps and values for one product-sensor pair"""
     
     ns_per_hour = 3_600_000_000_000
     start_ns = start_date.astype("datetime64[ns]").astype(np.int64)
