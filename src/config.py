@@ -5,9 +5,9 @@ from pathlib import Path
 YEAR = 2020
 
 # Sensor configuration
-NUM_BASE_SENSORS = 2001  # field_0 to field_2000
-NUM_NEW_SENSORS = 20     # field_2001 to field_2020
-NUM_PRODUCTS = 11       # product_id 1 to 10
+NUM_BASE_SENSORS = 20  # field_0 to field_2000
+NUM_NEW_SENSORS = 2     # field_2001 to field_2020
+NUM_PRODUCTS = 11       # product_id 0 to 10
 
 # Data generation
 LAMBDA_PER_HOUR = 20  # Poisson rate: avg events per hour per (product, sensor)

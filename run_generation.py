@@ -50,7 +50,7 @@ def main():
     print(f"Output: {DATA_DIR}")
     
     # Generate data, outer loop by product, inner loop by month
-    for product_id in range(1, NUM_PRODUCTS + 1):
+    for product_id in range(0, NUM_PRODUCTS + 1):
         product_start = time.time()
         product_rows = 0
         
