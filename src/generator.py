@@ -142,5 +142,3 @@ def write_partition(table: pa.Table, output_dir: Path, product_id: int, batch_id
     pq.write_table(table, file_path, compression="zstd")
     
     return file_path
-
-     

@@ -30,10 +30,9 @@ def get_month_ranges(year: int) -> list[tuple[np.datetime64, int]]:
 
 
 def main():
-    """Generate 60GB+ of sensor data."""
-    print("=" * 60)
+    """Generate sensor data."""
+  
     print("IoT Data Generation")
-    print("=" * 60)
     
     # Setup
     DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -46,10 +45,9 @@ def main():
     start_time = time.time()
     
     print(f"Generating data for {YEAR}")
-    print(f"  Products: {NUM_PRODUCTS}")
-    print(f"  Sensors: {NUM_BASE_SENSORS}")
-    print(f"  Output: {DATA_DIR}")
-    print("-" * 60)
+    print(f"Products: {NUM_PRODUCTS}")
+    print(f"Sensors: {NUM_BASE_SENSORS}")
+    print(f"Output: {DATA_DIR}")
     
     # Generate data, outer loop by product, inner loop by month
     for product_id in range(1, NUM_PRODUCTS + 1):
@@ -78,25 +76,23 @@ def main():
             product_rows += len(table)
             total_bytes += file_size
             
-            print(f"  Product {product_id:2d} | {start_date} | "
+            print(f"Product {product_id:2d} | {start_date} | "
                   f"rows: {len(table):,} | "
                   f"size: {file_size / 1e6:.1f} MB | "
                   f"time: {batch_time:.1f}s")
         
         product_time = time.time() - product_start
         total_rows += product_rows
-        print(f"  Product {product_id:2d} complete: {product_rows:,} rows in {product_time:.1f}s")
-        print("-" * 60)
+        print(f"Product {product_id:2d} complete: {product_rows:,} rows in {product_time:.1f}s")
     
     # Summary
     total_time = time.time() - start_time
-    print("=" * 60)
     print("Generation Complete")
-    print(f"  Total rows: {total_rows:,}")
-    print(f"  Total size: {total_bytes / 1e9:.2f} GB")
-    print(f"  Total time: {total_time:.1f}s ({total_time / 60:.1f} min)")
-    print(f"  Throughput: {total_rows / total_time:,.0f} rows/sec")
-    print("=" * 60)
+    print(f"Total rows: {total_rows:,}")
+    print(f"Total size: {total_bytes / 1e9:.2f} GB")
+    print(f"Total time: {total_time:.1f}s ({total_time / 60:.1f} min)")
+    print(f"Throughput: {total_rows / total_time:,.0f} rows/sec")
+
     
     # Validation asserts
     assert total_rows > 0, "No data generated"
@@ -109,7 +105,7 @@ def main():
         files = list(partition_dir.glob("*.parquet"))
         assert len(files) == 12, f"Expected 12 files for product {pid}, got {len(files)}"
     
-    print("All validation checks passed!")
+    print("Validation checks passed!")
 
 
 if __name__ == "__main__":
