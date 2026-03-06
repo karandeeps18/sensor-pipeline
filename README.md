@@ -2,22 +2,6 @@
 
 A scalable Python system for generating, processing, and analyzing large-scale time-series sensor data (~60GB).
 
-## Getting Started
-
-### Setup
-
-```bash
-# Clone and navigate to project
-cd iot-pipeline
-
-# Make setup script executable and run
-chmod +x setup.sh
-./setup.sh
-
-# Activate virtual environment
-source venv/bin/activate
-```
-
 ### Running Tasks
 
 **1. Generate Data (~60GB)**
