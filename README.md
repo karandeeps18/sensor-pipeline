@@ -21,11 +21,11 @@ python run_task1.py
 ```
 
 - **Output:**
-    - `output/results/per_day.csv` — Aggregations per Monday, per sensor, per 10-min bucket
-    - `output/results/across_days.csv` — Aggregations averaged across all Mondays
-    - `output/results/per_day_extended.csv` — Same with new sensors (2001-2020)
-    - `output/results/across_days_extended.csv` — Same with new sensors
-    - `output/results/sensor_*.png` — Distribution plots for sensors [10, 100, 1000]
+    - Aggregations per Monday, per sensor, per 10-min bucket
+    - Aggregations averaged across all Mondays
+    - Same with new sensors (2001-2020)
+    - Same with new sensors
+    - Distribution plots for sensors [10, 100, 1000]
 
 **3. Streaming Simulation (Task 2)**
 
