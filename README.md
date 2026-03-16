@@ -1,4 +1,4 @@
-# IoT Time-Series Data Pipeline
+# High Frequency Data Pipeline
 
 A scalable Python system for generating, processing, and analyzing large-scale time-series sensor data (~60GB).
 
